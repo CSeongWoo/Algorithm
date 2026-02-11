@@ -28,7 +28,10 @@ public class Solution {
 				st = new StringTokenizer(br.readLine());
 				for (int j = 0; j < N; j++) {
 					map[i][j] = Integer.parseInt(st.nextToken());
-					if (map[i][j] == 1) {
+					if (map[i][j] == 1) { // 불필요한 탐색 줄이기
+						if (i == 0 || i == N - 1 || j == 0 || j == N - 1) {
+							continue;
+						}
 						cores[coreCount][0] = i;
 						cores[coreCount][1] = j;
 						coreCount++;
