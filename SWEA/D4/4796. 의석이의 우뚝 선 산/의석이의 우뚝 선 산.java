@@ -1,21 +1,24 @@
+import java.io.StreamTokenizer;
 import java.util.ArrayDeque;
-import java.util.Scanner;
 
 public class Solution {
+	@SuppressWarnings("deprecation")
 	public static void main(String args[]) throws Exception
 	{
 
-		Scanner sc = new Scanner(System.in);
-		int T;
-		T=sc.nextInt();
+		StreamTokenizer st = new StreamTokenizer(System.in);
+		st.nextToken();
+		int T = (int)st.nval;
 		StringBuilder sb = new StringBuilder();
 
 		for(int test_case = 1; test_case <= T; test_case++)
 		{
-			int N = sc.nextInt();
+			st.nextToken();
+			int N = (int)st.nval;
 			int arr[] = new int[N];
 			for(int i = 0; i<N; i++) {
-				arr[i] = sc.nextInt();
+				st.nextToken();
+				arr[i] = (int)st.nval;
 			}
 
 			int ans = 0;
