@@ -7,16 +7,35 @@ public class Solution {
 	static class Group {
 		int r;
 		int c;
-		int cell;
+		int sum;
 		int dir;
-		int timer;
+		int maxCnt;
+		
+		boolean alive = true;
 
-		Group(int r, int c, int cell, int dir, int timer) {
+		Group(int r, int c, int sum, int dir, int maxCnt) {
 			this.r = r;
 			this.c = c;
-			this.cell = cell;
+			this.sum = sum;
 			this.dir = dir;
-			this.timer = timer;
+			this.maxCnt = maxCnt;
+		}
+		void move() {
+			r += dr[dir];
+			c += dc[dir];
+			if (r == N - 1 || r == 0 || c == N -1 || c == 0) {
+				dir = reverseDir(dir);
+				sum /= 2;
+			}
+			if (sum == 0) alive = false;
+		}
+		
+		int reverseDir(int dir) {
+			if (dir <= 1) {
+				return dir == 0 ? 1 : 0;
+			} else {
+				return dir == 3 ? 2 : 3;
+			}
 		}
 	}
 
@@ -25,7 +44,9 @@ public class Solution {
 	// 상 하 좌 우
 	static int[] dr = { -1, 1, 0, 0 };
 	static int[] dc = { 0, 0, -1, 1 };
-
+	static Group[] map;
+	static List<Group> list = new ArrayList<>();
+	
 	public static void main(String args[]) throws Exception {
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -38,73 +59,59 @@ public class Solution {
 			N = Integer.parseInt(st.nextToken());
 			M = Integer.parseInt(st.nextToken());
 			K = Integer.parseInt(st.nextToken());
-
-			ArrayList<Group> list = new ArrayList<>();
-			Deque<Group> moved = new ArrayDeque<>();
+			
+			map = new Group[N * N];
+			list.clear();
 			for (int i = 0; i < K; i++) {
 				st = new StringTokenizer(br.readLine());
 				int r = Integer.parseInt(st.nextToken());
 				int c = Integer.parseInt(st.nextToken());
 				int cell = Integer.parseInt(st.nextToken());
 				int dir = Integer.parseInt(st.nextToken()) - 1;
-				list.add(new Group(r, c, cell, dir, 0));
+				list.add(new Group(r, c, cell, dir, cell));
 			}
-			int ans = 0;
-			int currTime = 0;
-			for (int i = 0; i < M; i++) {
-				for(Group curr : list) {
-					int nr = curr.r + dr[curr.dir];
-					int nc = curr.c + dc[curr.dir];
-					int cell = curr.cell;
-					int dir = curr.dir;
-					int time = curr.timer + 1;
-					if (nr == N - 1 || nr == 0 || nc == N - 1 || nc == 0) {
-						cell = curr.cell / 2;
-						dir = reverseDir(dir);
-						if (cell == 0) {
-							continue;
-						}
-					}
-					moved.offer(new Group(nr, nc, cell, dir, time));
-				}
-				list.clear();
-				int[][][] map = new int[N][N][3]; // cell 합, 최대 군집, 방향
-				int count = 0;
-				// 모든 움직인 셀들을 병합.
-				while (!moved.isEmpty()) {
-					Group group = moved.poll();
-					count += group.cell;
-					if (map[group.r][group.c][0] != 0) {
-						if (map[group.r][group.c][1] < group.cell) {
-							map[group.r][group.c][1] = group.cell;
-							map[group.r][group.c][2] = group.dir;
-						}
+			
+			int timer = 0;
+			List<Integer> posList = new ArrayList<>();
+			while(timer < M) {
+				posList.clear();
+				for(Group g : list) {
+					if (!g.alive) continue;
+					g.maxCnt = g.sum;
+					g.move();
+					if (!g.alive) continue;
+					int pos = g.r * N + g.c;
+					posList.add(pos);
+					if (map[pos] == null) {
+						map[pos] = g;
 					} else {
-						map[group.r][group.c][1] = group.cell;
-						map[group.r][group.c][2] = group.dir;
-					}
-					map[group.r][group.c][0] += group.cell;
-				}
-				for (int r = 0; r < N; r++) {
-					for (int c = 0; c < N; c++) {
-						if (map[r][c][0] > 0) {
-							list.add(new Group(r, c, map[r][c][0], map[r][c][2], currTime));
+						Group curr = map[pos];
+						if (curr.maxCnt < g.maxCnt) {
+							g.sum += curr.sum;
+							curr.alive = false;
+							map[pos] = g;
+						} else {
+							curr.sum += g.sum;
+							g.alive = false;
 						}
 					}
 				}
-				ans = count;
+				for(int pos : posList) {
+					map[pos] = null;
+				}
+				timer++;
 			}
-
+			
+			int ans = 0;
+			for (Group g : list) {
+				if (!g.alive) continue;
+				ans += g.sum;
+			}
+			
 			sb.append("#").append(test_case).append(" ").append(ans).append("\n");
 		}
 		System.out.println(sb);
 	}
 
-	static int reverseDir(int dir) {
-		if (dir <= 1) {
-			return dir == 0 ? 1 : 0;
-		} else {
-			return dir == 2 ? 3 : 2;
-		}
-	}
+	
 }
