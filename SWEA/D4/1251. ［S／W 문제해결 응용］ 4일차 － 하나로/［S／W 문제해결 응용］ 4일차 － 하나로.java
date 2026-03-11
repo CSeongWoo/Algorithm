@@ -1,61 +1,34 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
+/**
+ * 메모리: 96,324 kb
+ * 시간: 746 ms
+ */
 
 public class Solution {
 	
-	static class Edge implements Comparable<Edge>{
-		int start, end;
+	static class Node implements Comparable<Node> {
+		int vertex;
 		double weight;
-		Edge(int start, int end, double weight) {
-			this.start = start;
-			this.end = end;
+		Node next; // 노드에 연결된 간선들
+		
+		Node(int vertex, double weight, Node next) {
+			this.vertex = vertex;
 			this.weight = weight;
+			this.next = next;
 		}
+
 		@Override
-		public int compareTo(Edge o) {
+		public int compareTo(Node o) {
 			return Double.compare(this.weight, o.weight);
 		}
+		
 	}
+
 	static int V;
-	static int[] parents;
-	static List<Edge> edgeList;
 	
 	static int[] xArr;
 	static int[] yArr;
-	
-	static void makeSets() {
-		parents = new int[V];
-		for(int i = 0; i < V; i++) {
-			parents[i] = -1;
-		}
-	}
-	
-	static int findSet(int a) {
-		if (parents[a] < 0) return a;
-		return parents[a] = findSet(parents[a]);
-	}
-	
-	static boolean union(int a, int b) {
-		int aRoot = findSet(a);
-		int bRoot = findSet(b);
-		if (aRoot == bRoot) return false;
-		
-		if (parents[aRoot] <= parents[bRoot]) {
-			parents[aRoot] += parents[bRoot];
-			parents[bRoot] = aRoot;
-		} else {
-			parents[bRoot] += parents[aRoot];
-			parents[aRoot] = bRoot;
-		}
-		return true;
-	}
-	
-	
 	public static void main(String args[]) throws Exception
 	{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -67,9 +40,10 @@ public class Solution {
 			sb.append("#").append(test_case).append(" ");
 			st = new StringTokenizer(br.readLine());
 			V = Integer.parseInt(st.nextToken());
-			edgeList = new ArrayList<>();
 			xArr = new int[V];
 			yArr = new int[V];
+			Node[] adjList = new Node[V]; // 노드 갯수
+			double[] visited = new double[V]; // 연결 여부
 			
 			st = new StringTokenizer(br.readLine());
 			for(int i = 0; i < V; i++) {
@@ -84,29 +58,36 @@ public class Solution {
 
 			st = new StringTokenizer(br.readLine());
 			double E = Double.parseDouble(st.nextToken());
-			// 모든 섬 간의 거리 구하기
-			for(int i = 0; i < V - 1; i++) {
-				for(int j = i + 1; j < V; j++) {
-					double distance = Math.pow(Math.abs(xArr[i] - xArr[j]), 2)  +  Math.pow(Math.abs(yArr[i] - yArr[j]), 2);
-					edgeList.add(new Edge(i, j, distance * E));
+			// 모든 섬 간의 거리 구하기 + 간선 추가하기. => E
+			for(int from = 0; from < V - 1; from++) {
+				for(int to = from + 1; to < V; to++) {
+					double distance = Math.pow(Math.abs(xArr[from] - xArr[to]), 2)  +  Math.pow(Math.abs(yArr[from] - yArr[to]), 2);
+					adjList[from] = new Node(to, distance * E, adjList[from]);
+					adjList[to] = new Node(from, distance * E, adjList[to]);
 				}
 			}
 			
-			makeSets();
+			Arrays.fill(visited, -1);
 			
-			Collections.sort(edgeList);
+			visited[0] = 0;
+			PriorityQueue<Node> pq = new PriorityQueue<>();
+			for(Node temp = adjList[0]; temp != null; temp = temp.next) {
+				pq.offer(temp);
+			}
 			
-			int count = 0;
 			double ans = 0;
-			for(Edge edge : edgeList) {
-				// 사이클이 없음 -> 합치기
-				if (union(edge.start, edge.end)) {
-					ans += edge.weight;
-					// 선택한 간선 갯수가 V - 1 -> 모든 선 연결 완료.
-					if(++count == V - 1) break;
+			while(!pq.isEmpty()) {
+				Node curr = pq.poll();
+				if (visited[curr.vertex] != -1) continue; // 이미 방문 완료된 노드.
+				
+				ans += curr.weight;
+				visited[curr.vertex] = curr.weight;
+				for(Node next = adjList[curr.vertex]; next != null; next = next.next) {
+					if (visited[next.vertex] == -1) {
+						pq.offer(next);
+					}
 				}
 			}
-			;
 			sb.append(Math.round(ans)).append("\n");
 		}
 		System.out.println(sb);
