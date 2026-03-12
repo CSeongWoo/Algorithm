@@ -4,7 +4,7 @@ import java.util.*;
 public class Solution {
 	static final int END_COUNT = 7;
 	
-	static int[][] map;
+	static int[][] map = new int[4][4];
 	static TreeSet<Integer> set;
 	static int dr[] = {1, -1, 0, 0};
 	static int dc[] = {0, 0, 1, -1};
@@ -18,7 +18,6 @@ public class Solution {
 
 		for(int test_case = 1; test_case <= T; test_case++)
 		{
-			map = new int[4][4];
 			set = new TreeSet<>();
 			for(int i = 0; i < 4; i++) {
 				st = new StringTokenizer(br.readLine());
