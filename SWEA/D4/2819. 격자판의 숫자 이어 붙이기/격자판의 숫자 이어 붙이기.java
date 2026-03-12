@@ -4,8 +4,8 @@ import java.util.*;
 public class Solution {
 	static final int END_COUNT = 7;
 	
-	static char[][] map;
-	static HashSet<String> set;
+	static int[][] map;
+	static TreeSet<Integer> set;
 	static int dr[] = {1, -1, 0, 0};
 	static int dc[] = {0, 0, 1, -1};
 	
@@ -18,17 +18,17 @@ public class Solution {
 
 		for(int test_case = 1; test_case <= T; test_case++)
 		{
-			map = new char[4][4];
-			set = new HashSet<>();
+			map = new int[4][4];
+			set = new TreeSet<>();
 			for(int i = 0; i < 4; i++) {
 				st = new StringTokenizer(br.readLine());
 				for(int j = 0; j < 4; j++) {
-					map[i][j] = st.nextToken().charAt(0);
+					map[i][j] = Integer.parseInt(st.nextToken());;
 				}
 			}
 			for(int i = 0; i < 4; i++) {
 				for(int j = 0; j < 4; j++) {
-					DFS(i, j, String.valueOf(map[i][j]), 0);
+					DFS(i, j, map[i][j], 0);
 				}
 			}
 			sb.append("#").append(test_case).append(" ").append(set.size()).append("\n");
@@ -36,16 +36,16 @@ public class Solution {
 		System.out.println(sb);
 	}
 	
-	static void DFS(int r, int c, String line, int count) {
+	static void DFS(int r, int c, int numbers, int count) {
 		if (count == END_COUNT) {
-			set.add(line);
+			set.add(numbers);
 			return;
 		}
 		for(int dir = 0; dir < 4; dir++) {
 			int nr = r + dr[dir];
 			int nc = c + dc[dir];
 			if (nr < 0 || nr >= 4 || nc < 0 || nc >= 4) continue;
-			String nextLine = line + String.valueOf(map[r][c]);
+			int nextLine = numbers * 10 + map[r][c];
 			DFS(nr, nc, nextLine, count + 1);
 		}
 		return;
