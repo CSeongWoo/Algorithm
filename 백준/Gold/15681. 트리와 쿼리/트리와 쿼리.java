@@ -28,11 +28,13 @@ public class Main {
 			tree[from].add(to);
 		}
 		findSubTrees(root);
+		StringBuilder sb = new StringBuilder();
 		for(int query = 0; query < Q; query++) {
 			st = new StringTokenizer(br.readLine());
 			int vertex = Integer.parseInt(st.nextToken());
-			System.out.println(subTrees[vertex]);
+			sb.append(subTrees[vertex]).append("\n");
 		}
+		System.out.println(sb);
 	}
 	static int findSubTrees(int index) {
 		visited[index] = true;
