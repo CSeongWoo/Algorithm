@@ -16,21 +16,19 @@ public class Main {
 		int left[] = new int[N]; // 해당 행의 가장 왼쪽에 있는 기계의 좌표값
 		int right[] = new int[N]; // 해당 행의 가장 오른쪽에 있는 기계
 		// 시작 -> 해당 행에 있는 (방향) 끝쪽 기계로 향한다. -> 만약 현재 위치보다 현재 방향보다 더 끝쪽에 기계가 있다 -> 글로 감. -> 반대 방향에 존재하면 달려감.
-		
-		map = new int[N][N];
 		Arrays.fill(left, 10000);
 		Arrays.fill(right, -1);
 		for(int i = 0; i < N; i++) {
 			char[] charArray = br.readLine().toCharArray();
 			for(int j = 0; j < N; j++) {
-				map[i][j] = charArray[j] - '0';
-				if (map[i][j] == 1) {
+				int a = charArray[j] - '0';
+				if (a == 1) {
 					count[i]++;
 					left[i] = Integer.min(j, left[i]);
 					right[i] = Integer.max(j, right[i]);
 				}
 			}
-		}
+        }
 		// 각 행의 시작 시점에서 왼쪽 방향인지 오른쪽 방향인지 확인
 
 		int[][] dp = new int[N][2]; 
